@@ -1,0 +1,103 @@
+#include Servo.h
+
+Servo my_servo;
+#define SENSOR_AMOUNT 6
+int sensorValues[SENSOR_AMOUNT]; 
+
+
+#define AUTO_MODE 1
+#define MANUAL_MODE 0
+bool autoturn_mode = AUTO_MODE;
+
+
+#define SENSOR_AMOUNT 6
+#define SCAN_NUMBER 5
+#define ANGLE_STEP 60
+#define MAX_ANGLE 360
+int cur_angle = 0;
+
+
+/////////////////////////////////////////////////
+///////////   MQTT_Topics   /////////////////////
+/////////////////////////////////////////////////
+const String BASE_TOPIC = "student/SCH1517/";
+
+const String IN_TURN_MODE_TOPIC = BASE_TOPIC + "in/turn_mode/";
+const String IN_TURN_SPEED_TOPIC = BASE_TOPIC + "in/turn_speed/";
+const String IN_STATUS_UPDATE_TOPIC = BASE_TOPIC + "in/status_update/";
+const String IN_CYCLE_PERIOD_TOPIC = BASE_TOPIC + "in/cycle_period/"
+
+const String OUT_SENSOR_TOPIC = BASE_TOPIC + "out/sensor/";
+const String OUT_CUR_ANGLE_TOPIC = BASE_TOPIC + "out/cur_angle/";
+const String OUT_TURN_MODE_TOPIC = BASE_TOPIC + "out/turn_mode/";
+const String OUT_TURN_SPEED_TOPIC = BASE_TOPIC + "out/turn_speed/";
+const String OUT_CYCLE_PERIOD_TOPIC = BASE_TOPIC + "out/cycle_period/";
+
+
+int my_analogRead(byte sensor_number){
+  ; //Дополнить,просмотрев принцип работы с внешним АЦП
+}
+
+void get_sensorData(){
+  uint32_t rawSensorData[SENSOR_AMOUNT];
+  for (int j = 0; j < SCAN_NUMBER; j ++){
+    for (int i = 0; i < SENSOR_AMOUNT; i ++){  
+      rawSensorData[i] += my_analogRead(j);
+    }
+  }
+
+  for (int i = 0; i < SENSOR_AMOUNT; i ++)
+    sensorValues[i] = rawSensorData[i] / SENSOR_AMOUNT; 
+}
+
+//angle [-179, 180]
+void turn(int angle)
+{
+	
+}
+
+void autoturn(){
+  minV = sensorValues[0];
+  minInd = 0;
+  maxV = sensorValues[0];
+  maxInd = 0;
+  for (int i=1; i<SENSOR_AMOUNT; i++){
+	  if (sensorValues[i] > maxV){
+      maxV = sensorValues[i];
+      maxInd = i;
+    }
+    else if (sensorValues[i] < minV){
+      minV = sensorValues[i];
+      minInd = i;
+    }
+  }
+  if (ANGLE_STEP * minInd > ANGLE_STEP * maxInd){
+    int cur_angle = MAX_ANGLE - ANGLE_STEP * minInd + ANGLE_STEP * maxInd;
+  }
+  else{
+    int cur_angle = abs(ANGLE_STEP * maxInd - ANGLE_STEP * minInd);
+  }
+  servo.write(cur_angle);
+}
+
+void manual_turn(){
+  ;
+}
+
+void main_loop(){
+  get_sensorData();
+  if (autoturn_mode = 1){
+      autoturn();
+  }
+  else{
+    manual_turn();
+  }
+  send_sensorData(){
+    //
+  }
+
+}
+
+void setup() {
+  myservo.attach(9); 
+}
